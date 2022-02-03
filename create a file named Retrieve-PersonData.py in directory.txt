@@ -1,0 +1,65 @@
+Clark Ltd
+Clark is the financial powerhouse of the group. It must process all the money-related data sources.
+Forex-The first financial duty of the company is to perform any foreign exchange trading.
+Forex Base Data-Previously, you found a single data source (Euro_ExchangeRates.csv) for
+forex rates in Clark. Earlier in the chapter, I helped you to create the load, as part of your R
+processing.
+The relevant file is Retrieve_Retrieve_Euro_ExchangeRates.csv in directory
+C:\ VKHCG\04-Clark\01-Retrieve\01-EDS\01-R. So, that data is ready.
+Financials - Clark generates the financial statements for all the group’s companies.
+Financial Base Data - You found a single data source (Profit_And_Loss.csv) in Clark for
+financials and, as mentioned previously, a single data source (Euro_ExchangeRates.csv) for
+forex rates. The file relevant file is Retrieve_Profit_And_Loss.csv in directory
+C:\VKHCG\04-Clark\01-Retrieve\ 01-EDS\01-R.
+Person Base Data
+Start Python editor and create a file named Retrieve-PersonData.py in directory .
+C:\VKHCG\04-Clark\01-Retrieve.
+################################################################
+# -*- coding: utf-8 -*-
+################################################################
+import sys
+import os
+import shutil
+import zipfile
+import pandas as pd
+################################################################
+Base='C:/VKHCG'
+################################################################
+print('################################')
+print('Working Base :',Base, ' using ', sys.platform)
+print('################################')
+################################################################
+Company='04-Clark'
+ZIPFiles=['Data_female-names','Data_male-names','Data_last-names']
+for ZIPFile in ZIPFiles:
+ InputZIPFile=Base+'/'+Company+'/00-RawData/' + ZIPFile + '.zip'
+ OutputDir=Base+'/'+Company+'/01-Retrieve/01-EDS/02-Python/' + ZIPFile
+ OutputFile=Base+'/'+Company+'/01-Retrieve/01-EDS/02-Python/Retrieve-'+ZIPFile+'.csv'
+ zip_file = zipfile.ZipFile(InputZIPFile, 'r')
+ zip_file.extractall(OutputDir)
+ zip_file.close()
+ t=0
+ for dirname, dirnames, filenames in os.walk(OutputDir):
+ for filename in filenames:
+ sCSVFile = dirname + '/' + filename
+ t=t+1
+ if t==1:
+PSIT1P2 ~~~~~ Data Science Practical
+M. Sc. [Information Technology ] SEMESTER ~ I Teacher’s Reference Manual
+56
+ NameRawData=pd.read_csv(sCSVFile,header=None,low_memory=False)
+ NameData=NameRawData
+ else:
+ NameRawData=pd.read_csv(sCSVFile,header=None,low_memory=False)
+ NameData=NameData.append(NameRawData)
+ NameData.rename(columns={0 : 'NameValues'},inplace=True)
+ NameData.to_csv(OutputFile, index = False)
+ shutil.rmtree(OutputDir)
+ print('Process: ',InputZIPFile)
+#################################################################
+print('### Done!! ############################################')
+#################################################################
+This generates three files named
+Retrieve-Data_female-names.csv
+Retrieve-Data_male-names.csv
+Retrieve-Data_last-names.csv
