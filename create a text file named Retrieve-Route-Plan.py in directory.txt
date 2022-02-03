@@ -1,0 +1,114 @@
+Create a Delivery Route
+The model enables you to generate a complex routing plan for the shipping routes of the company. Start your
+Python editor and create a text file named Retrieve-Route-Plan.py in directory .
+C:\VKHCG\03-Hillman\01-Retrieve.
+################################################################
+# -*- coding: utf-8 -*-
+PSIT1P2 ~~~~~ Data Science Practical
+M. Sc. [Information Technology ] SEMESTER ~ I Teacher’s Reference Manual
+51
+################################################################
+import os
+import sys
+import pandas as pd
+from geopy.distance import vincenty
+################################################################
+InputFileName='GB_Postcode_Warehouse.csv'
+OutputFileName='Retrieve_GB_Warehouse.csv'
+Company='03-Hillman'
+################################################################
+Base='C:/VKHCG'
+print('################################')
+print('Working Base :',Base, ' using ', sys.platform)
+print('################################')
+################################################################
+sFileDir=Base + '/' + Company + '/01-Retrieve/01-EDS/02-Python'
+if not os.path.exists(sFileDir):
+ os.makedirs(sFileDir)
+################################################################
+sFileName=Base + '/' + Company + '/00-RawData/' + InputFileName
+print('###########')
+print('Loading :',sFileName)
+Warehouse=pd.read_csv(sFileName,header=0,low_memory=False)
+WarehouseClean=Warehouse[Warehouse.latitude != 0]
+WarehouseGood=WarehouseClean[WarehouseClean.longitude != 0]
+WarehouseGood.drop_duplicates(subset='postcode', keep='first', inplace=True)
+WarehouseGood.sort_values(by='postcode', ascending=1)
+################################################################
+sFileName=sFileDir + '/' + OutputFileName
+WarehouseGood.to_csv(sFileName, index = False)
+################################################################
+WarehouseLoop = WarehouseGood.head(20)
+for i in range(0,WarehouseLoop.shape[0]):
+ print('Run :',i,' =======>>>>>>>>>>',WarehouseLoop['postcode'][i])
+ WarehouseHold = WarehouseGood.head(10000)
+ WarehouseHold['Transaction']=WarehouseHold.apply(lambda row:
+ 'WH-to-WH'
+ ,axis=1)
+ OutputLoopName='Retrieve_Route_' + 'WH-' + WarehouseLoop['postcode'][i] + '_Route.csv'
+
+ WarehouseHold['Seller']=WarehouseHold.apply(lambda row:
+ 'WH-' + WarehouseLoop['postcode'][i]
+ ,axis=1)
+PSIT1P2 ~~~~~ Data Science Practical
+M. Sc. [Information Technology ] SEMESTER ~ I Teacher’s Reference Manual
+52
+
+ WarehouseHold['Seller_Latitude']=WarehouseHold.apply(lambda row:
+ WarehouseHold['latitude'][i],axis=1)
+ WarehouseHold['Seller_Longitude']=WarehouseHold.apply(lambda row:
+ WarehouseLoop['longitude'][i],axis=1)
+
+ WarehouseHold['Buyer']=WarehouseHold.apply(lambda row:
+ 'WH-' + row['postcode'],axis=1)
+
+ WarehouseHold['Buyer_Latitude']=WarehouseHold.apply(lambda row:
+ row['latitude'],axis=1)
+ WarehouseHold['Buyer_Longitude']=WarehouseHold.apply(lambda row:
+ row['longitude'],axis=1)
+
+ WarehouseHold['Distance']=WarehouseHold.apply(lambda row: round(
+ vincenty((WarehouseLoop['latitude'][i],WarehouseLoop['longitude'][i]),
+ (row['latitude'],row['longitude'])).miles,6),axis=1)
+
+ WarehouseHold.drop('id', axis=1, inplace=True)
+ WarehouseHold.drop('postcode', axis=1, inplace=True)
+ WarehouseHold.drop('latitude', axis=1, inplace=True)
+ WarehouseHold.drop('longitude', axis=1, inplace=True)
+ ################################################################
+ sFileLoopName=sFileDir + '/' + OutputLoopName
+ WarehouseHold.to_csv(sFileLoopName, index = False)
+#################################################################
+print('### Done!! ############################################')
+#################################################################
+Output:
+====== RESTART: C:\VKHCG\03-Hillman\01-Retrieve\Retrieve-Route-Plan.py ======
+################################
+Working Base : C:/VKHCG using win32
+################################
+###########
+Loading : C:/VKHCG/03-Hillman/00-RawData/GB_Postcode_Warehouse.csv
+Run : 0 =======>>>>>>>>>> AB10
+Run : 1 =======>>>>>>>>>> AB11
+Run : 2 =======>>>>>>>>>> AB12
+Run : 3 =======>>>>>>>>>> AB13
+Run : 4 =======>>>>>>>>>> AB14
+Run : 5 =======>>>>>>>>>> AB15
+Run : 6 =======>>>>>>>>>> AB16
+Run : 7 =======>>>>>>>>>> AB21
+Run : 8 =======>>>>>>>>>> AB22
+Run : 9 =======>>>>>>>>>> AB23
+Run : 10 =======>>>>>>>>>> AB24
+Run : 11 =======>>>>>>>>>> AB25
+PSIT1P2 ~~~~~ Data Science Practical
+M. Sc. [Information Technology ] SEMESTER ~ I Teacher’s Reference Manual
+53
+Run : 12 =======>>>>>>>>>> AB30
+Run : 13 =======>>>>>>>>>> AB31
+Run : 14 =======>>>>>>>>>> AB32
+Run : 15 =======>>>>>>>>>> AB33
+Run : 16 =======>>>>>>>>>> AB34
+Run : 17 =======>>>>>>>>>> AB35
+Run : 18 =======>>>>>>>>>> AB36
+Run : 19 =======>>>>>>>>>> AB37
+### Done!! ############################################
