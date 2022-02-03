@@ -1,0 +1,189 @@
+CPT—Carriage Paid To (Named Place of Destination)
+The seller, under this term, pays for the carriage of the goods up to the named place of destination. However, the
+goods are considered to be delivered when they have been handed over to the first carrier, so that the risk transfers
+to the buyer upon handing the goods over to the carrier at the place of shipment in the country of export.
+Start your Python editor and create a file named Retrieve-Incoterm-CPT.py in directory
+C:\VKHCG\03-Hillman\01-Retrieve.
+CIP—Carriage and Insurance Paid To (Named Place of Destination)
+This term is generally similar to the preceding CPT, with the exception that the seller is required to obtain
+insurance for the goods while in transit. Following is the data science version.
+DAT—Delivered at Terminal (Named Terminal at Port or Place of Destination)
+This Incoterm requires that the seller deliver the goods, unloaded, at the named terminal. The seller covers all
+the costs of transport (export fees, carriage, unloading from the main carrier at destination port, and destination
+port charges) and assumes all risks until arrival at the destination port or terminal.
+DAP—Delivered at Place (Named Place of Destination)
+According to Incoterm 2010’s definition, DAP—Delivered at Place—means that, at the disposal of the buyer,
+the seller delivers when the goods are placed on the arriving means of transport, ready for unloading at the named
+place of destination. Under DAP terms, the risk passes from seller to buyer from the point of destination
+mentioned in the contract of delivery.
+DDP—Delivered Duty Paid (Named Place of Destination)
+By this term, the seller is responsible for delivering the goods to the named place in the country of the buyer and
+pays all costs in bringing the goods to the destination, including import duties and taxes. The seller is not
+responsible for unloading. This term places the maximum obligations on the seller and minimum obligations on
+PSIT1P2 ~~~~~ Data Science Practical
+M. Sc. [Information Technology ] SEMESTER ~ I Teacher’s Reference Manual
+47
+the buyer. No risk or responsibility is transferred to the buyer until delivery of the goods at the named place of
+destination.
+Possible Shipping Routes
+There are numerous potential shipping routes available to the company. The retrieve step can generate the
+potential set, by using a route combination generator. This will give you a set of routes, but it is highly unlikely
+that you will ship along all of them. It is simply a population of routes that can be used by the data science to
+find the optimum solution.
+Start your Python editor and create a file named Retrieve-Warehouse-Incoterm-Chains.py in directory
+C:\VKHCG\03-Hillman\01-Retrieve.
+Adopt New Shipping Containers
+Adopting the best packing option for shipping in containers will require that I introduce a new concept. Shipping
+of containers is based on a concept reducing the packaging you use down to an optimum set of sizes having the
+following requirements:
+• The product must fit within the box formed by the four sides of a cube.
+• The product can be secured using packing foam, which will fill any void volume in the packaging.
+• Packaging must fit in shipping containers with zero space gaps.
+• Containers can only hold product that is shipped to a single warehouse, shop, or customer.
+Start your Python editor and create a text file named Retrieve-Container-Plan.py in directory .
+C:\VKHCG\03-Hillman\01-Retrieve.
+*** Replace pd.DataFrame.from_items with pd.DataFrame.from_dict
+################################################################
+# -*- coding: utf-8 -*-
+################################################################
+import sys
+import os
+import pandas as pd
+################################################################
+ContainerFileName='Retrieve_Container.csv'
+BoxFileName='Retrieve_Box.csv'
+ProductFileName='Retrieve_Product.csv'
+Company='03-Hillman'
+################################################################
+Base='C:/VKHCG'
+################################################################
+print('################################')
+print('Working Base :',Base, ' using ', sys.platform)
+print('################################')
+################################################################
+sFileDir=Base + '/' + Company + '/01-Retrieve/01-EDS/02-Python'
+if not os.path.exists(sFileDir):
+ os.makedirs(sFileDir)
+################################################################
+### Create the Containers
+################################################################
+containerLength=range(1,21)
+containerWidth=range(1,10)
+PSIT1P2 ~~~~~ Data Science Practical
+M. Sc. [Information Technology ] SEMESTER ~ I Teacher’s Reference Manual
+48
+containerHeigth=range(1,6)
+containerStep=1
+c=0
+for l in containerLength:
+ for w in containerWidth:
+ for h in containerHeigth:
+ containerVolume=(l/containerStep)*(w/containerStep)*(h/containerStep)
+ c=c+1
+ ContainerLine=[('ShipType', ['Container']),
+ ('UnitNumber', ('C'+format(c,"06d"))),
+ ('Length',(format(round(l,3),".4f"))),
+ ('Width',(format(round(w,3),".4f"))),
+ ('Height',(format(round(h,3),".4f"))),
+ ('ContainerVolume',(format(round(containerVolume,6),".6f")))]
+ if c==1:
+ ContainerFrame = pd.DataFrame.from_dict(ContainerLine)
+ else:
+ ContainerRow = pd.DataFrame.from_dict(ContainerLine)
+ ContainerFrame = ContainerFrame.append(ContainerRow)
+ ContainerFrame.index.name = 'IDNumber'
+
+print('################')
+print('## Container')
+print('################')
+print('Rows :',ContainerFrame.shape[0])
+print('Columns :',ContainerFrame.shape[1])
+print('################')
+################################################################
+sFileContainerName=sFileDir + '/' + ContainerFileName
+ContainerFrame.to_csv(sFileContainerName, index = False)
+################################################################
+## Create valid Boxes with packing foam
+################################################################
+boxLength=range(1,21)
+boxWidth=range(1,21)
+boxHeigth=range(1,21)
+packThick=range(0,6)
+boxStep=10
+b=0
+for l in boxLength:
+ for w in boxWidth:
+ for h in boxHeigth:
+ for t in packThick:
+ boxVolume=round((l/boxStep)*(w/boxStep)*(h/boxStep),6)
+ productVolume=round(((l-t)/boxStep)*((w-t)/boxStep)*((h-t)/boxStep),6)
+ if productVolume > 0:
+ b=b+1
+ BoxLine=[('ShipType', ['Box']),
+PSIT1P2 ~~~~~ Data Science Practical
+M. Sc. [Information Technology ] SEMESTER ~ I Teacher’s Reference Manual
+49
+ ('UnitNumber', ('B'+format(b,"06d"))),
+ ('Length',(format(round(l/10,6),".6f"))),
+ ('Width',(format(round(w/10,6),".6f"))),
+ ('Height',(format(round(h/10,6),".6f"))),
+ ('Thickness',(format(round(t/5,6),".6f"))),
+ ('BoxVolume',(format(round(boxVolume,9),".9f"))),
+ ('ProductVolume',(format(round(productVolume,9),".9f")))]
+ if b==1:
+ BoxFrame = pd.DataFrame.from_dict(BoxLine)
+ else:
+ BoxRow = pd.DataFrame.from_dict(BoxLine)
+ BoxFrame = BoxFrame.append(BoxRow)
+ BoxFrame.index.name = 'IDNumber'
+print('#################')
+print('## Box')
+print('#################')
+print('Rows :',BoxFrame.shape[0])
+print('Columns :',BoxFrame.shape[1])
+print('#################')
+################################################################
+sFileBoxName=sFileDir + '/' + BoxFileName
+BoxFrame.to_csv(sFileBoxName, index = False)
+################################################################
+## Create valid Product
+################################################################
+productLength=range(1,21)
+productWidth=range(1,21)
+productHeigth=range(1,21)
+productStep=10
+p=0
+for l in productLength:
+ for w in productWidth:
+ for h in productHeigth:
+ productVolume=round((l/productStep)*(w/productStep)*(h/productStep),6)
+ if productVolume > 0:
+ p=p+1
+ ProductLine=[('ShipType', ['Product']),
+ ('UnitNumber', ('P'+format(p,"06d"))),
+ ('Length',(format(round(l/10,6),".6f"))),
+ ('Width',(format(round(w/10,6),".6f"))),
+ ('Height',(format(round(h/10,6),".6f"))),
+ ('ProductVolume',(format(round(productVolume,9),".9f")))]
+ if p==1:
+ ProductFrame = pd.DataFrame.from_dict(ProductLine)
+ else:
+ ProductRow = pd.DataFrame.from_dict(ProductLine)
+ ProductFrame = ProductFrame.append(ProductRow)
+ BoxFrame.index.name = 'IDNumber'
+PSIT1P2 ~~~~~ Data Science Practical
+M. Sc. [Information Technology ] SEMESTER ~ I Teacher’s Reference Manual
+50
+print('#################')
+print('## Product')
+print('#################')
+print('Rows :',ProductFrame.shape[0])
+print('Columns :',ProductFrame.shape[1])
+print('#################')
+################################################################
+sFileProductName=sFileDir + '/' + ProductFileName
+ProductFrame.to_csv(sFileProductName, index = False)
+################################################################
+#################################################################
+print('### Done!! ############################################')
+#################################################################
