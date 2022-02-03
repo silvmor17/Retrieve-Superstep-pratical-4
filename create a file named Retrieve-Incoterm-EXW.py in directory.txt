@@ -1,0 +1,58 @@
+Hillman Ltd
+The company has four main jobs requiring your attention:
+• Planning the locations of the warehouses: Hillman has countless UK warehouses, but owing
+to financial hardships, the business wants to shrink the quantity of warehouses by 20%.
+• Planning the shipping rules for best-fit international logistics: At Hillman Global Logistics’
+expense, the company has shipped goods from its international warehouses to its UK shops.
+This model is no longer sustainable. The co-owned shops now want more feasibility regarding
+shipping options.
+• Adopting the best packing option for shipping in containers: Hillman has introduced a new
+three-size-shipping-container solution. It needs a packing solution encompassing the
+warehouses, shops, and customers.
+• Creating a delivery route: Hillman needs to preplan a delivery route for each of its warehouses
+to shops, to realize a 30% savings in shipping costs.
+Planning Shipping Rules for Best-Fit International Logistics
+(Befor this Program, first understand the business terms explained in the reference book)
+EXW—Ex Works (Named Place of Delivery)
+By this term, the seller makes the goods available at its premises or at another named place. This term
+places the maximum obligation on the buyer and minimum obligations on the seller.
+Start your Python editor and create a file named Retrieve-Incoterm-EXW.py in directory
+C:\VKHCG\03-Hillman\01-Retrieve.
+################################################################
+# -*- coding: utf-8 -*-
+PSIT1P2 ~~~~~ Data Science Practical
+M. Sc. [Information Technology ] SEMESTER ~ I Teacher’s Reference Manual
+44
+import os
+import sys
+import pandas as pd
+IncoTerm='EXW'
+InputFileName='Incoterm_2010.csv'
+OutputFileName='Retrieve_Incoterm_' + IncoTerm + '_RuleSet.csv'
+Company='03-Hillman'
+################################################################
+Base='C:/VKHCG'
+print('################################')
+print('Working Base :',Base, ' using ', sys.platform)
+print('################################')
+sFileDir=Base + '/' + Company + '/01-Retrieve/01-EDS/02-Python'
+if not os.path.exists(sFileDir):
+ os.makedirs(sFileDir)
+################################################################
+### Import Incoterms
+################################################################
+sFileName=Base + '/' + Company + '/00-RawData/' + InputFileName
+print('###########')
+print('Loading :',sFileName)
+IncotermGrid=pd.read_csv(sFileName,header=0,low_memory=False)
+IncotermRule=IncotermGrid[IncotermGrid.Shipping_Term == IncoTerm]
+print('Rows :',IncotermRule.shape[0])
+print('Columns :',IncotermRule.shape[1])
+print('###########')
+print(IncotermRule)
+sFileName=sFileDir + '/' + OutputFileName
+IncotermRule.to_csv(sFileName, index = False)
+print('### Done!! ############################################')
+Output
+See the file named Retrieve_Incoterm_EXW.csv in C:\VKHCG\03-Hillman\01-Retrieve\01-EDS\02-
+Python. Open this file,
