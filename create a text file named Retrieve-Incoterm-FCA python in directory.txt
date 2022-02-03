@@ -1,0 +1,50 @@
+FCA—Free Carrier (Named Place of Delivery)
+Under this condition, the seller delivers the goods, cleared for export, at a named place.
+If I were to buy Practical Data Science at an overseas duty-free shop and then pick it up at the duty-free desk
+before taking it home, and the shop has shipped it FCA— Free Carrier—to the duty-free desk, the moment I pay
+at the register, the ownership is transferred to me, but if anything happens to the book between the shop and the
+duty-free desk, the shop will have to pay. It is only once I pick it up at the desk that I will have to pay, if anything
+happens. So, the moment I take the book, the transaction becomes EXW, so I have to pay any necessary import
+duties on arrival in my home country. Let’s see what the data science finds. Start your Python editor and create
+a text file named Retrieve-Incoterm-FCA.py in directory .\VKHCG\03-Hillman\01-Retrieve.
+################################################################
+# -*- coding: utf-8 -*-
+################################################################
+import os
+import sys
+import pandas as pd
+################################################################
+IncoTerm='FCA'
+InputFileName='Incoterm_2010.csv'
+OutputFileName='Retrieve_Incoterm_' + IncoTerm + '_RuleSet.csv'
+Company='03-Hillman'
+################################################################
+Base='C:/VKHCG'
+print('################################')
+print('Working Base :',Base, ' using ', sys.platform)
+print('################################')
+################################################################
+sFileDir=Base + '/' + Company + '/01-Retrieve/01-EDS/02-Python'
+if not os.path.exists(sFileDir):
+ os.makedirs(sFileDir)
+################################################################
+### Import Incoterms
+################################################################
+sFileName=Base + '/' + Company + '/00-RawData/' + InputFileName
+print('###########')
+print('Loading :',sFileName)
+IncotermGrid=pd.read_csv(sFileName,header=0,low_memory=False)
+IncotermRule=IncotermGrid[IncotermGrid.Shipping_Term == IncoTerm]
+print('Rows :',IncotermRule.shape[0])
+print('Columns :',IncotermRule.shape[1])
+print('###########')
+print(IncotermRule)
+################################################################
+PSIT1P2 ~~~~~ Data Science Practical
+M. Sc. [Information Technology ] SEMESTER ~ I Teacher’s Reference Manual
+46
+sFileName=sFileDir + '/' + OutputFileName
+IncotermRule.to_csv(sFileName, index = False)
+################################################################
+print('### Done!! ############################################')
+################################################################
